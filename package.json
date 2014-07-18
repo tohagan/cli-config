@@ -2,7 +2,7 @@
 	"name": "cli-config",
 	"version": "0.1.0",
 	"description": "API to assist command line apps reading and merging config object from: lib/defaults.json, ./<app>.json, process.argv",
-	"homepage": "https://github.com/phonegap/connect-phonegap",
+	"homepage": "https://github.com/tohagan/cli-config",
 	"author": {
 		"name": "Tony O'Hagan",
 		"email": "tony@ohagan.name"
