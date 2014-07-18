@@ -1,13 +1,13 @@
 ## DESCRIPTION 
 
-A dead simple **one line** configuration API that combines:
+A dead simple **one line** configuration API that combines configuration object properties from:
  
 - package defaults.config file,
 - local .config file, 
 - command line options 
-- application overrides.  
+- application overrides.
 
-You can also optionally create a local .config file based on the `defaults.config` defined in you node package.
+Optionally creates a local .config file copied from the `defaults.config` defined in your node package.
 
 ## API
 
@@ -52,6 +52,6 @@ Deep merge nested configuration options from package `defaults.config` then `./m
 The configuration object returned by [minimist](https://github.com/substack/minimist) command line parser can be used to override the default or local config file options.
 
 ## Design Features:
-
-  - Supports comments to your `defaults.config` file so the user can understand how to configure their local copy.
-  - Even though the local config file will initially replace all the options in the `default.config` file, we still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted in the package `default.config` file.
+  - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.
+  - A local .config file will initially replace all the options in the `default.config` file it was copied from. We still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted via the new `default.config` file.
+  - The API is primarily designed for command line interfaces installed globally.
