@@ -23,11 +23,11 @@ Options:
 
 Return:
 
-  - {Object} Configuration object based on options applied in order of precedence from ...      
-    1. Command line arguments (See [https://github.com/substack/minimist](https://github.com/substack/minimist) )
-    2. `<appname>.json`
-    3. `defaults.json` 
-    4. `config` Object.
+  - {Object} Configuration object based on options applied in order of precedence from ...
+    1. `config` Object.
+    1. Command line arguments (Parser is [minimist](https://github.com/substack/minimist) )
+    1. ./`<appname>.json`
+    1. `defaults.json`
 
 Example:
 
