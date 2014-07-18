@@ -1,0 +1,38 @@
+{
+	"name": "cli-config",
+	"version": "0.1.0",
+	"description": "API to assist command line apps reading and merging config object from: lib/defaults.json, ./<app>.json, process.argv",
+	"homepage": "https://github.com/phonegap/connect-phonegap",
+	"author": {
+		"name": "Tony O'Hagan",
+		"email": "tony@ohagan.name"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:tohagan/cli-config.git"
+	},
+	"keywords": [
+		"config",
+		"configuration",
+		"options",
+		"cli",
+		"command-line",
+		"default",
+		"defaults"
+	],
+	"preferGlobal": "false",
+	"main": "lib/index.js",
+	"scripts": {
+		"test": "jasmine-node --color spec"
+	},
+	"engines": {
+		"node": ">=0.10.0"
+	},
+	"dependencies": {
+        "strip-json-comments": "0.1.3",
+		"minimist": "0.2.0"
+	}, 
+	"devDependencies": {
+		"jasmine-node": "1.8.0"
+    }
+}

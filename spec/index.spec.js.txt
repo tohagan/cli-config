@@ -1,0 +1,15 @@
+/*!
+ * Module dependencies.
+ */
+
+var cliConfig = require('../lib/index');
+
+/*!
+ * Specification: cli-config
+ */
+
+describe('cli-config', function() {
+    it('should be an function', function() {
+        expect(cliConfig).toEqual(jasmine.any(Function));
+    });
+});
