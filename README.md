@@ -1,35 +1,52 @@
 ## DESCRIPTION 
-	
-Simple one line API to manage all configuration file and command line options.
 
-  - Optionally clone a local config file for each app based on defaults.js defined in node package.
-  - JSON configuration files support comments.
+A dead simple **one line** configuration API that combines:
+ 
+- package defaults.config file,
+- local .config file, 
+- command line options 
+- application overrides.  
 
+You can also optionally create a local .config file based on the `defaults.config` defined in you node package.
 
 ## API
 
-    var override = { a:1, verbose: true };
-    config = require('cli-config')({ dirname: __dirname, clone: true }, override);
+    var config = require('cli-config')(options, override);
 
-### phonegap()
-
-Options:
+### Options:
 
   - `[options]` {Object}
-    - `[dirname]`		{String} Directory containing `defaults.json` file used to read package defaults.
-    - `[configFile]`	{String} Local configuration file used by application. (default: `<appname>.json`)
-    - `[clone]`	    	{Boolean} If `true`, copies `defaults.json` file to local configuration file. (default: `false`).
-  - `[config]`			{Object} Override other configuration file values.  (default: `null`) 
+    - `[dirname]`		{String} Directory containing `defaults.config` JSON file used to read package defaults. Normally `__dirname` from calling script.
+    - `[configFile]`	{String} Local configuration file name. (default: `./<appname>.config`).
+    - `[clone]`	    	{Boolean} If `true`, copies package `defaults.config` file to local configuration file. (default: `false`).
+    - `[merge]`			{String} Merge attributes using `'shallow'` or `'deep'` recursive merging (default: `'shallow'`).
+  - `[override]`		{Object} Optional final override to other configuration properties.  (default: `null`) 
 
-Return:
+**.config** files are UTF8 JSON format that can contain `//` or `/* ... */` comments.
 
-  - {Object} Configuration object based on options applied in order of precedence from ...
-    1. `config` Object.
-    1. Command line arguments (Parser is [minimist](https://github.com/substack/minimist) )
-    1. ./`<appname>.json`
-    1. `defaults.json`
+### Returns:
 
-Example:
+  - {Object} A configuration object based on merging attributes in the following order:
+    1. Package defaults (`defaults.config` JSON file in the `dirname` folder).
+    1. Local configuration file (`configFile` JSON file that defaults to `./<appname>.config`).
+    1. Command line arguments parsed by [minimist](https://github.com/substack/minimist). 
+    1. An optional `override` object from your application. 
 
-	var override = { debug: true };
-	var config = require('../cli-config')({dirname: __dirname, clone: true});
+	*All of these are optional.*
+	
+## Examples:
+
+Combine configuration options from package file `defaults.config` then `./<appname>.config` then command line options then force the `debug` option to be `true`.  Use a shallow merge so only the top level properties are merged.  
+
+	var config = require('../cli-config')({dirname: __dirname}, {debug: true });
+	
+Deep merge nested configuration options from package `defaults.config` then `./myapp.config` then command line options.  If `myapp.config` does not exist, clone a copy of `defaults.config` into `./myapp.config` so the user can use it to override `defaults.config` in the future.
+
+	var config = require('../cli-config')({dirname: __dirname , clone: true, configFile: 'myapp.config'});
+
+The configuration object returned by [minimist](https://github.com/substack/minimist) command line parser can be used to override the default or local config file options.
+
+## Design Features:
+
+  - Add comments to your `defaults.config` file so the user can understand how to configure their local copy.
+  - Even though the local config file will initially replace all the options in the `default.config` file, we still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted in the package `default.config` file.
