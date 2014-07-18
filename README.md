@@ -42,11 +42,16 @@ Combine configuration options from package file `defaults.config` then `./<appna
 	
 Deep merge nested configuration options from package `defaults.config` then `./myapp.config` then command line options.  If `myapp.config` does not exist, clone a copy of `defaults.config` into `./myapp.config` so the user can use it to override `defaults.config` in the future.
 
-	var config = require('../cli-config')({dirname: __dirname , clone: true, configFile: 'myapp.config'});
+	var config = require('../cli-config')({
+		dirname: __dirname,
+		clone: true,
+		configFile: 'myapp.config',
+		merge: 'deep'
+	});
 
 The configuration object returned by [minimist](https://github.com/substack/minimist) command line parser can be used to override the default or local config file options.
 
 ## Design Features:
 
-  - Add comments to your `defaults.config` file so the user can understand how to configure their local copy.
+  - Supports comments to your `defaults.config` file so the user can understand how to configure their local copy.
   - Even though the local config file will initially replace all the options in the `default.config` file, we still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted in the package `default.config` file.
