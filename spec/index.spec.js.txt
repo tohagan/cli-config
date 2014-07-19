@@ -8,8 +8,12 @@ var cliConfig = require('../lib/index');
  * Specification: cli-config
  */
 
-describe('cli-config', function() {
-    it('should be an function', function() {
-        expect(cliConfig).toEqual(jasmine.any(Function));
+describe('cli-config - text exported interface methods', function() {
+    it('should be an object', function() {
+        expect(cliConfig).toEqual(jasmine.any(Object));
+		
+		it('cliConfig.getConfig should be a function', function() {
+			expect(cliConfig.getConfig).toEqual(jasmine.any(Function));
+		});
     });
 });
