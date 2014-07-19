@@ -13,11 +13,11 @@ Optionally creates an initial user config file cloned from the `defaults.config`
 
 Combine configuration options from package file `defaults.config` then `~/.<appname>.config` then command line options then force the `debug` option to be `true`.  Uses a shallow merge so only the top level properties are merged.  
 
-	var config = require('../cli-config')({dirname: __dirname}, {debug: true});
+	var config = require('../cli-config').getConfig({dirname: __dirname}, {debug: true});
 	
 Deep merge nested configuration options from package `defaults.config` then `./myapp.config` then command line options.  If `myapp.config` does not exist, clone a copy of `defaults.config` into `./myapp.config` so the user can use it to override `defaults.config` in the future.
 
-	var config = require('../cli-config')({
+	var config = require('../cli-config').getConfig({
 		dirname: __dirname,
 		clone: true,
 		configFile: 'myapp.config',
@@ -26,7 +26,7 @@ Deep merge nested configuration options from package `defaults.config` then `./m
 
 The command line parser returns a configuration object can be used to override the system default or local config file options.  You can configure this parser using the **cli** option.  
 
-	var config = require('../cli-config')({
+	var config = require('../cli-config').getConfig({
 		dirname: __dirname,
 		cli: { 
 			boolean: {
@@ -50,7 +50,7 @@ Refer to [minimist](https://github.com/substack/minimist) for more details about
   - To support furture upgrades of the local config file, it's recommended that the defaults.config file includes a _schema property set to the current schema version number.
 ## API
 
-    var config = require('cli-config')(options, override);
+    var config = require('cli-config').getConfig(options, override);
 
 ### Options:
 
