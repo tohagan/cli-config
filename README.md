@@ -44,9 +44,9 @@ Refer to [minimist](https://github.com/substack/minimist) for more details about
 	
 ### Design:
 
+  - Although usable in libaries, the API is primarily designed for command line interfaces installed globally.
   - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.
-  - A local .config file will initially replace all the options in the `default.config` file it was copied from. We still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted via the new `default.config` file.
-  - The API is primarily designed for command line interfaces installed globally.
+  - If the `clone` option is set, a local <appname>.config file is created that will initially replace all the options in the `default.config` file it was copied from. We still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted via the new `default.config` file.
 
 ## API
 
