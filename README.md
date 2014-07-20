@@ -15,13 +15,13 @@ Combine configuration options from package file `defaults.config` then `~/.<appn
 
 	var config = require('../cli-config').getConfig({dirname: __dirname}, {debug: true});
 	
-Deep merge nested configuration options from package `defaults.config` then `./myapp.config` then command line options.  If `myapp.config` does not exist, clone a copy of `defaults.config` into `./myapp.config` so the user can use it to override `defaults.config` in the future.
+Deep merge nested configuration options from package `defaults.config` then `./config.json` then command line options.  If `myapp.config` does not exist, clone a copy of `defaults.config` into `./config.json` so the user can use it to override `defaults.config` in the future.
 
 	var config = require('../cli-config').getConfig({
-		dirname: __dirname,
-		clone: true,
-		configFile: 'myapp.config',
-		merge: 'deep'
+		dirname: __dirname,          // Looks for system wide defaults.config in this package folder
+		clone: true,                 // Creates a ./config.json if none exists. 
+		configFile: './config.json', // Keep settings here rather than ~/.<appname>.config
+		merge: 'deep'                // Deep merge all config file settings & command line settings.
 	});
 
 The command line parser returns a configuration object can be used to override the system default or local config file options.  You can configure this parser using the **cli** option.  
@@ -48,6 +48,7 @@ Refer to [minimist](https://github.com/substack/minimist) for more details about
   - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.
   - If the `clone` option is set, a local ~/.<appname>.config file is created that will initially replace all the options in the `default.config` file it was copied from. We still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted via the new `default.config` file.
   - To support furture upgrades of the local config file, it's recommended that the defaults.config file includes a _schema property set to the current schema version number.
+
 ## API
 
     var config = require('cli-config').getConfig(options, override);
@@ -71,5 +72,5 @@ Refer to [minimist](https://github.com/substack/minimist) for more details about
     1. Command line arguments parsed by [minimist](https://github.com/substack/minimist). 
     1. An optional `override` object from your application. 
 
-	*All of these are optional.*
+*All of these are optional.*
 	

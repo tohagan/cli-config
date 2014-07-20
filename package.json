@@ -1,6 +1,6 @@
 {
     "name": "cli-config",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "Single line API to manage app configuration including: package defaults, local config files, command line options and app overrides.",
     "homepage": "https://github.com/tohagan/cli-config",
     "author": {
