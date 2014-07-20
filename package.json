@@ -1,7 +1,7 @@
 {
     "name": "cli-config",
-    "version": "0.1.5",
-    "description": "Single line API to manage app configuration including: package defaults, local config files, command line options and app overrides.",
+    "version": "0.2.0",
+    "description": "Single line API to manage app configuration including: package defaults, local config files, command line options and app overrides. v0.2.0 optionally executes command line verbs.",
     "homepage": "https://github.com/tohagan/cli-config",
     "author": {
         "name": "Tony O'Hagan",
@@ -14,11 +14,14 @@
     "keywords": [
         "config",
         "configuration",
+        "settings",
         "options",
         "cli",
         "command-line",
         "default",
-        "defaults"
+        "defaults",
+        "json",
+        "minimist"
     ],
     "preferGlobal": "false",
     "main": "lib/index.js",
