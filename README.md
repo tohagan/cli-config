@@ -5,9 +5,18 @@ A simple **one line** configuration API that combines configuration object prope
 - System configuration file,
 - User configuration file, 
 - Command line options 
-- Application overrides.
+- Application overrides
 
-Optionally creates an initial user config file cloned from the `defaults.config` defined in your node package.
+*All of these are optional.*	
+
+### Design & Features:
+
+  - Although usable in any node package, the API is primarily designed for command line interfaces.
+  - Configuration files and command line options use one schema in your package `defaults.config` file.
+  - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.  Our JSON parser safely strips these comments.
+  - If you set the `clone: true` flag, it create a local user setting file in `~/.<appname>.config` copied from the package `defaults.config` file.
+  - When users settings file is create it will initially replace all the options in the `default.config` file it was copied from, however we still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted via the new `default.config` file.
+  - To support furture upgrades of the local config file, it's recommended that you `defaults.config` file includes a _schema property set to the current schema version number so future versions of your app can detect that the local config file is out of date and may need to be upgraded.
 
 ### Examples:
 
@@ -42,13 +51,6 @@ Sets the config.debug and config.verbose options to true.
 
 Refer to [minimist](https://github.com/substack/minimist) for more details about command line parsing options.
 	
-### Design and Usage Recommendations:
-
-  - Although usable in libaries, the API is primarily designed for command line interfaces installed globally.
-  - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.
-  - If the `clone` option is set, a local ~/.<appname>.config file is created that will initially replace all the options in the `default.config` file it was copied from. We still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted via the new `default.config` file.
-  - To support furture upgrades of the local config file, it's recommended that the defaults.config file includes a _schema property set to the current schema version number.
-
 ## API
 
     var config = require('cli-config').getConfig(options, override);
@@ -62,7 +64,7 @@ Refer to [minimist](https://github.com/substack/minimist) for more details about
     - `[merge]`			{String} Merge attributes using `'shallow'` or `'deep'` recursive merging (default: `'shallow'`).
   - `[override]`		{Object} Optional final override to other configuration properties.  (default: `null`) 
 
-**.config** files are UTF8 JSON format that can contain `//` or `/* ... */` comments.
+**.config** files are parsed as UTF8 JSON format that can contain `//` or `/* ... */` comments.
 
 ### Returns:
 
