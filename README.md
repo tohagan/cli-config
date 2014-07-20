@@ -1,9 +1,9 @@
 ## DESCRIPTION 
 
-A simple **one line** configuration API that combines configuration object properties from:
+A simple **one line** configuration API that combines properties from:
  
-- System configuration file,
-- User configuration file, 
+- System settings file
+- User settings file
 - Command line options 
 - Application overrides
 
@@ -12,11 +12,11 @@ A simple **one line** configuration API that combines configuration object prope
 ### Design & Features:
 
   - Although usable in any node package, the API is primarily designed for command line interfaces.
-  - Configuration files and command line options use one schema in your package `defaults.config` file.
-  - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.  Our JSON parser safely strips these comments.
-  - If you set the `clone: true` flag, it create a local user setting file in `~/.<appname>.config` copied from the package `defaults.config` file.
-  - When users settings file is create it will initially replace all the options in the `default.config` file it was copied from, however we still perform a merge with it since a future upgrade of your app may add new attributes that will need to be defaulted via the new `default.config` file.
-  - To support furture upgrades of the local config file, it's recommended that you `defaults.config` file includes a _schema property set to the current schema version number so future versions of your app can detect that the local config file is out of date and may need to be upgraded.
+  - Configuration files and command line options use one schema defined in your package `defaults.config` file.
+  - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.
+  - If you set the `clone: true` flag, it creates an initial user settings file in `~/.<appname>.config` copied from the package `defaults.config` file
+  - When users settings file is create it will initially override all the options in the `default.config` file it was copied from, however we still perform a merge with `defaults.config` since a future upgrade of your app may add new properties that will need to be defaulted via your new `default.config` file.
+  - To support future upgrades of the user settings file, it's recommended that your `defaults.config` file includes a `_schema` property set to the current schema version number so future versions of your app can detect that the user settings file is out of date and may need to be upgraded.
 
 ### Examples:
 
@@ -24,16 +24,16 @@ Combine configuration options from package file `defaults.config` then `~/.<appn
 
 	var config = require('../cli-config').getConfig({dirname: __dirname}, {debug: true});
 	
-Deep merge nested configuration options from package `defaults.config` then `./config.json` then command line options.  If `myapp.config` does not exist, clone a copy of `defaults.config` into `./config.json` so the user can use it to override `defaults.config` in the future.
+Deep merge nested configuration settings from package `defaults.config` then `./config.json` then command line options.  If `./config.json` does not exist, clone a copy from `defaults.config` so the user can use it to override `defaults.config` in the future.
 
 	var config = require('../cli-config').getConfig({
 		dirname: __dirname,          // Looks for system wide defaults.config in this package folder
 		clone: true,                 // Creates a ./config.json if none exists. 
-		configFile: './config.json', // Keep settings here rather than ~/.<appname>.config
+		configFile: './config.json', // Keep user settings here rather than the default ~/.<appname>.config
 		merge: 'deep'                // Deep merge all config file settings & command line settings.
 	});
 
-The command line parser returns a configuration object can be used to override the system default or local config file options.  You can configure this parser using the **cli** option.  
+The command line parser returns an object that can be used to override the system settings or user settings options.  You can configure this parser using the **cli** option.  Refer to [minimist](https://github.com/substack/minimist) for more details about command line parsing options.
 
 	var config = require('../cli-config').getConfig({
 		dirname: __dirname,
@@ -49,8 +49,6 @@ Sets the config.debug and config.verbose options to true.
 
 	$ myapp -d -v     
 
-Refer to [minimist](https://github.com/substack/minimist) for more details about command line parsing options.
-	
 ## API
 
     var config = require('cli-config').getConfig(options, override);
