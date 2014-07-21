@@ -1,17 +1,17 @@
 ## DESCRIPTION
 
-A simple **one line** `getConfig()` method that combines properties from:
+A simple `getConfig()` call that combines properties from ...
  
 - System settings file
 - User settings file
 - Command line options 
 - Application overrides
 
-If you app supports multiple commands you can use a simple `run()` method that:
+If your app uses commands verbs you can implement your entire command line interface using a single `run()` method  that ...
 
-- Calls `getConfig()` and then finds and executes a command specified in your command line interface.
+- Calls `getConfig()` and then finds your command function from a command tree object and executes it.
+  - Rapidly build your command tree based on functions exported by your modules.    
   - Command functions accept a single `config` argument returned by `getConfig()`.
-  - Rapidly build your command interface based on functions exported by your modules.    
 
 ### Design & Features:
 
@@ -169,9 +169,7 @@ Loads configuration settings and executes a command function from the command tr
 	try {
         var cmdTree = { ... } // Same as getCommandFn() example above.
 
-	    var cli = require('cli-config');
-
-	    cli.run({
+	    require('cli-config').run({
 	        dirname: __dirname,
 	        clone: true, 
 	        cli: {
