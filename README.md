@@ -13,6 +13,16 @@ If your app uses commands verbs you can implement your entire command line inter
   - Rapidly build your command tree based on functions exported by your modules.    
   - Command functions accept a single `config` argument returned by `getConfig()`.
 
+## Simplest API calls:
+
+This might be all you need to create a complete command line interface to your lib:
+
+    require('cli-config').run({dirname: __dirname, cmdTree: require('./lib'});
+
+If you only need to fetch configuration and command line options: 
+
+    var config = require('cli-config').getConfig({dirname: __dirname});
+
 ### Design & Features:
 
   - Although usable in any node package, the API is primarily designed for command line interfaces.
@@ -33,11 +43,11 @@ Returns configuration settings object.
 ### Options:
 
   - `[options]` {Object}
-    - `[cli]`			{Object} Command line interface parsing options.  Refer to [minimist](https://github.com/substack/minimist) documentation.
-    - `[configFile]`	{String} Local configuration file name. (default: `~/.<appname>.config`).
-    - `[clone]`			{Boolean} If `true`, copies package `defaults.config` file to local configuration file. (default: `false`).
-    - `[merge]`			{String} Merge attributes using `'shallow'` or `'deep'` recursive merging (default: `'shallow'`).
-    - `[override]`		{Object} Optional final override to other configuration properties.  (default: `null`) 
+    - `[cli]`            {Object} Command line interface parsing options.  Refer to [minimist](https://github.com/substack/minimist) documentation.
+    - `[configFile]`    {String} Local configuration file name. (default: `~/.<appname>.config`).
+    - `[clone]`            {Boolean} If `true`, copies package `defaults.config` file to local configuration file. (default: `false`).
+    - `[merge]`            {String} Merge attributes using `'shallow'` or `'deep'` recursive merging (default: `'shallow'`).
+    - `[override]`        {Object} Optional final override to other configuration properties.  (default: `null`) 
 
 **.config** files are parsed as UTF8 JSON format that can contain `//` or `/* ... */` comments.
 
@@ -50,52 +60,55 @@ Returns configuration settings object.
     1. An optional `override` object from your application. 
 
 *All of these are optional.*
-	
+    
 ### Example 1:
 
 Combine configuration options from package file `defaults.config` then `~/.<appname>.config` then command line options then force the `debug` option to be `true`.  Uses a shallow merge so only the top level properties are merged.  
 
-	var config = require('../cli-config').getConfig({dirname: __dirname, override: {debug: true}});
-	
+    var config = require('../cli-config').getConfig({dirname: __dirname, override: {debug: true}});
+    
 ### Example 2:
 
 Deep merge nested configuration settings from package `defaults.config` then `./config.json` then command line options.  If `./config.json` does not exist, clone a copy from `defaults.config` so the user can use it to override `defaults.config` in the future.
 
-	var config = require('../cli-config').getConfig({
-		dirname: __dirname,          // Looks for system wide defaults.config in this package folder
-		clone: true,                 // Creates a ./config.json if none exists. 
-		configFile: './config.json', // Keep user settings here rather than the default ~/.<appname>.config
-		merge: 'deep'                // Deep merge all config file settings & command line settings.
-	});
+    var config = require('../cli-config').getConfig({
+        dirname: __dirname,          // Looks for system wide defaults.config in this package folder
+        clone: true,                 // Creates a ./config.json if none exists. 
+        configFile: './config.json', // Keep user settings here rather than ~/.<appname>.config
+        merge: 'deep'                // Deep merge all config file settings & command line settings.
+    });
 
 ### Example 3:
 
 The command line parser returns an object that can be used to override the system settings or user settings options.  You can configure this parser using the **cli** option.  Refer to [minimist](https://github.com/substack/minimist) for more details about command line parsing options.
 
-	var config = require('../cli-config').getConfig({
-		dirname: __dirname,
-		cli: { 
-			boolean: {
-				'd': 'debug',
-				'v': 'verbose'
-			} 
-		} 
-	});
-	
+    var config = require('../cli-config').getConfig({
+        dirname: __dirname,
+        cli: { 
+            boolean: {
+                'd': 'debug',
+                'v': 'verbose'
+            } 
+        } 
+    });
+    
 Sets the config.debug and config.verbose options to true.
 
-	$ myapp -d -v     
+    $ myapp -d -v     
 
-## getCommandFn(options, config)
+## findCommand(options, config, callback)
 
-Returns a command function from a command tree.
+Finds a command function from a command tree.
 
 ### Options:
 
    - `[options]` {Object}
       - `[cmdTree]` {Object} Object tree where attributes are command words and leaf node values are functions. 
       - `[fnHelp]`  {Function} Function returned when no command matching is found.
-   - `[config]`  {Object} Object returned by getConfig() or minimist API. 
+   - `[config]`  {Object} Object returned by getConfig() or minimist API.
+   - `[callback]` {Function} Called bcak with the arguments:
+     - `fnCommand`  {Function} Command function found.
+     - `args`       {Array} Command arguments (command line words remaining after finding the command)
 
 ### Returns:
 
@@ -120,26 +133,26 @@ Returns a command function from a command tree.
             var appName = path.basename(process.argv[1]);
             [
                 'Commands:',
-			    'pigs add  -n <name>   - Add Pigs to the farm',
-			    'pigs remove -n <name> - Remove last pig from the farm',
-			    'pigs fly              - Makes all pigs fly',
-			    'farm init -n <name>   - Initialise farm',
-			    'farm list             - List farm animals',
-			    'version               - Displays app version',
-			    'settings              - Displays app settings'
-			    'help                  - Displays this help message'
-			].forEach(function(line) {
-				console.info(appName + ' ' + line);
-			});
+                'pigs add  -n <name>   - Add Pigs to the farm',
+                'pigs remove -n <name> - Remove last pig from the farm',
+                'pigs fly              - Makes all pigs fly',
+                'farm init -n <name>   - Initialise farm',
+                'farm list             - List farm animals',
+                'version               - Displays app version',
+                'settings              - Displays app settings'
+                'help                  - Displays this help message'
+            ].forEach(function(line) {
+                console.info(appName + ' ' + line);
+            });
         },
 
         // LIB commands
         // Replace with just "pigs: require('lib/pigs")" and any new exported functions become the commands!
         pigs: {
-			add:    pigs.add,
-			remove: pigs.remove,
-			fly:    pigs.fly
-		}
+            add:    pigs.add,
+            remove: pigs.remove,
+            fly:    pigs.fly
+        }
         // Replace with just "farm: require('lib/farm")" and any new exported functions become the commands!
         farm: {
             init: farm.init,
@@ -148,15 +161,15 @@ Returns a command function from a command tree.
     };
 
     var cli = require('cli-config');
-    
-    var config = this.getConfig(options);
-    var fnCmd = this.getCommandFn(options, config);    // <== EXAMPLE API CALL 
+    var config = cli.getConfig(options);
+    cli.findCommand(options, config, function(fnCmd, args) {   // <== EXAMPLE API CALL 
+        fnCmd.call(this, config, args); // Execute command function
+    });        
 
-    fnCmd.call(this, config); // Execute command function
 
 ## run(options)
 
-Replace `getConfig()` and `getCommandFn()` with a single `run()` call. 
+Replace `getConfig()` and `findCommand()` with a single `run()` call. 
 
 Loads configuration settings and executes a command function from the command tree.
 
@@ -166,24 +179,25 @@ Loads configuration settings and executes a command function from the command tr
 
 ### Example
 
-	try {
+    try {
         var cmdTree = { ... } // Same as getCommandFn() example above.
 
-	    require('cli-config').run({
-	        dirname: __dirname,
-	        clone: true, 
-	        cli: {
-	            boolean: {
-	                'v': 'verbose'  // -v = true/false flag
-	            },
-	            string: { 
-	                'n': 'name'	    // -n <name> = abbreviation for -name <name> 
-	            }
-	        },
-	        cmdTree: cmdTree,
-	        fnHelp: cmdTree.help
-	    });
-	} catch (err) {
-		console.error(err);
-		process.exit(1);
-	}
+        var cli = require('cli-config');    
+        cli.run({
+            dirname: __dirname,
+            clone: true, 
+            cli: {
+                boolean: {
+                    'v': 'verbose'  // -v = true/false flag
+                },
+                string: { 
+                    'n': 'name'     // -n <name> = abbreviation for -name <name> 
+                }
+            },
+            cmdTree: cmdTree,
+            fnHelp: cmdTree.help
+        });
+    } catch (err) {
+        console.error(err);
+        process.exit(1);
+    }

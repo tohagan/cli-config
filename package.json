@@ -1,6 +1,6 @@
 {
     "name": "cli-config",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Dead simple 'one call' API to manage system and user settings, command line options, app overrides and command actions.",
     "homepage": "https://github.com/tohagan/cli-config",
     "author": {
