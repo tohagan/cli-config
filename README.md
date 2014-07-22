@@ -71,10 +71,12 @@ Combine configuration options from package file `defaults.config` then `~/.<appn
 
 Deep merge nested configuration settings from package `defaults.config` then `./config.json` then command line options.  If `./config.json` does not exist, clone a copy from `defaults.config` so the user can use it to override `defaults.config` in the future.
 
+    
     var config = require('../cli-config').getConfig({
         dirname: __dirname,          // Looks for system wide defaults.config in this package folder
         clone: true,                 // Creates a ./config.json if none exists. 
-        configFile: './config.json', // Keep user settings here rather than ~/.<appname>.config
+        configFile: './config.yaml', // Keep user settings here rather than ~/.<appname>.config
+        parser: YAML.parse,          // Parse config file using YAML parser.  Add 'yamljs' package.
         merge: 'deep'                // Deep merge all config file settings & command line settings.
     });
 
