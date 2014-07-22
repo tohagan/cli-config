@@ -27,6 +27,7 @@ If you only need to fetch configuration and command line options:
 
   - Although usable in any node package, the API is primarily designed for command line interfaces.
   - Configuration files and command line options use one schema defined in your package `defaults.config` file.
+  - Override the parser to support YAML, Coffee Script or any other .config file format. 
   - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.
   - If you set the `clone: true` flag, it creates an initial user settings file in `~/.<appname>.config` copied from the package `defaults.config` file
   - When users settings file is create it will initially override all the options in the `default.config` file it was copied from, however we still perform a merge with `defaults.config` since a future upgrade of your app may add new properties that will need to be defaulted via your new `default.config` file.
@@ -71,10 +72,12 @@ Combine configuration options from package file `defaults.config` then `~/.<appn
 
 Deep merge nested configuration settings from package `defaults.config` then `./config.json` then command line options.  If `./config.json` does not exist, clone a copy from `defaults.config` so the user can use it to override `defaults.config` in the future.
 
+    
     var config = require('../cli-config').getConfig({
         dirname: __dirname,          // Looks for system wide defaults.config in this package folder
         clone: true,                 // Creates a ./config.json if none exists. 
-        configFile: './config.json', // Keep user settings here rather than ~/.<appname>.config
+        configFile: './config.yaml', // Keep user settings here rather than ~/.<appname>.config
+        parser: YAML.parse,          // Parse config file using YAML parser.  Add 'yamljs' package.
         merge: 'deep'                // Deep merge all config file settings & command line settings.
     });
 
