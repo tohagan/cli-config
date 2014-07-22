@@ -1,7 +1,7 @@
 {
     "name": "cli-config",
-    "version": "0.2.1",
-    "description": "Dead simple 'one call' API to manage system and user settings, command line options, app overrides and command actions.",
+    "version": "0.2.2",
+    "description": "Dead simple 'one call' API to convert your lib into a command line interface. Manage system & user settings, CLI options & actions, app overrides.  BYO YAML/CoffeeScript parser.",
     "homepage": "https://github.com/tohagan/cli-config",
     "author": {
         "name": "Tony O'Hagan",
@@ -17,6 +17,9 @@
         "settings",
         "options",
         "cli",
+        "yaml",
+        "coffee",
+        "coffeescript",
         "command-line",
         "default",
         "defaults",

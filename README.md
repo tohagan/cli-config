@@ -27,7 +27,7 @@ If you only need to fetch configuration and command line options:
 
   - Although usable in any node package, the API is primarily designed for command line interfaces.
   - Configuration files and command line options use one schema defined in your package `defaults.config` file.
-  - Override the parser to support YAML, Coffee Script or any other .config file format. 
+  - BYO parser to support YAML, Coffee Script or any other .config file format.
   - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.
   - If you set the `clone: true` flag, it creates an initial user settings file in `~/.<appname>.config` copied from the package `defaults.config` file
   - When users settings file is create it will initially override all the options in the `default.config` file it was copied from, however we still perform a merge with `defaults.config` since a future upgrade of your app may add new properties that will need to be defaulted via your new `default.config` file.
