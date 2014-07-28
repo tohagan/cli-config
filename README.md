@@ -18,6 +18,7 @@ If your app uses commands verbs you can implement your entire command line inter
 
 This might be all you need to create a complete command line interface to your lib:
 
+    #!/usr/bin/env node
     require('cli-config').run({dirname: __dirname, cmdTree: require(__dirname + '/lib'});
 
 If you only need to fetch configuration and command line options: 
@@ -70,6 +71,8 @@ Adds a obj.pkg field that is a object instance of your package.json file.
 
 Combine configuration options from package file `defaults.config` then `~/.<appname>.config` then command line options then force the `debug` option to be `true`.  Uses a shallow merge so only the top level properties are merged.  
 
+    #!/usr/bin/env node
+    
     var config = require('../cli-config').getConfig({dirname: __dirname, override: {debug: true}});
     
     console.log(config.pkg.appName + ' ' + config.pkg.version); // Use package.json fields
@@ -194,6 +197,8 @@ Loads configuration settings and executes a command function from the command tr
 
 ### Example
 
+    #!/usr/bin/env node
+    
     try {
         var cmdTree = { ... } // Same as getCommandFn() example above.
 
