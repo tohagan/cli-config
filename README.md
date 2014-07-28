@@ -6,6 +6,7 @@ A simple `getConfig()` call that combines properties from ...
 - User settings file
 - Command line options 
 - Application overrides
+- package.json fields
 
 If your app uses commands verbs you can implement your entire command line interface using a single `run()` method  that ...
 
@@ -17,7 +18,7 @@ If your app uses commands verbs you can implement your entire command line inter
 
 This might be all you need to create a complete command line interface to your lib:
 
-    require('cli-config').run({dirname: __dirname, cmdTree: require('./lib'});
+    require('cli-config').run({dirname: __dirname, cmdTree: require(__dirname + '/lib'});
 
 If you only need to fetch configuration and command line options: 
 
@@ -31,7 +32,7 @@ If you only need to fetch configuration and command line options:
   - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.
   - If you set the `clone: true` flag, it creates an initial user settings file in `~/.<appname>.config` copied from the package `defaults.config` file
   - When users settings file is create it will initially override all the options in the `default.config` file it was copied from, however we still perform a merge with `defaults.config` since a future upgrade of your app may add new properties that will need to be defaulted via your new `default.config` file.
-  - To support future upgrades of the user settings file, it's recommended that your `defaults.config` file includes a `_schema` property set to the current schema version number so future versions of your app can detect that the user settings file is out of date and may need to be upgraded.
+  - To support future upgrades of the user settings file, it's recommended that your `defaults.config` file includes a `_schema` property set to the current schema version number so future versions of your app can detect that the user settings file is out of date and may need to be migrate to the new schema.
 
 # API
 
@@ -44,11 +45,12 @@ Returns configuration settings object.
 ### Options:
 
   - `[options]` {Object}
-    - `[cli]`            {Object} Command line interface parsing options.  Refer to [minimist](https://github.com/substack/minimist) documentation.
+    - `[dirname]`       Root directory of your app package.  Used to find `package.json` and `defaults.json` files.
+    - `[cli]`           {Object} Command line interface parsing options.  Refer to [minimist](https://github.com/substack/minimist) documentation.
     - `[configFile]`    {String} Local configuration file name. (default: `~/.<appname>.config`).
-    - `[clone]`            {Boolean} If `true`, copies package `defaults.config` file to local configuration file. (default: `false`).
-    - `[merge]`            {String} Merge attributes using `'shallow'` or `'deep'` recursive merging (default: `'shallow'`).
-    - `[override]`        {Object} Optional final override to other configuration properties.  (default: `null`) 
+    - `[clone]`         {Boolean} If `true`, copies package `defaults.config` file to local configuration file. (default: `false`).
+    - `[merge]`         {String} Merge attributes using `'shallow'` or `'deep'` recursive merging (default: `'shallow'`).
+    - `[override]`      {Object} Optional final override to other configuration properties.  (default: `null`) 
 
 **.config** files are parsed as UTF8 JSON format that can contain `//` or `/* ... */` comments.
 
@@ -60,6 +62,8 @@ Returns configuration settings object.
     1. Command line arguments parsed by [minimist](https://github.com/substack/minimist). 
     1. An optional `override` object from your application. 
 
+Adds a obj.pkg field that is a object instance of your package.json file.
+
 *All of these are optional.*
     
 ### Example 1:
@@ -67,6 +71,9 @@ Returns configuration settings object.
 Combine configuration options from package file `defaults.config` then `~/.<appname>.config` then command line options then force the `debug` option to be `true`.  Uses a shallow merge so only the top level properties are merged.  
 
     var config = require('../cli-config').getConfig({dirname: __dirname, override: {debug: true}});
+    
+    console.log(config.pkg.appName + ' ' + config.pkg.version); // Use package.json fields
+    console.log(config);
     
 ### Example 2:
 
@@ -106,16 +113,16 @@ Finds a command function from a command tree.
 ### Options:
 
    - `[options]` {Object}
-      - `[cmdTree]` {Object} Object tree where attributes are command words and leaf node values are functions. 
-      - `[fnHelp]`  {Function} Function returned when no command matching is found.
+      - `[cmdTree]` {Object} Command tree where attributes are command words and leaf node values are functions. 
+      - `[fnHelp]`  {Function} Function returned when no command matching is found. (default:  `cmdTree.help || function() { throw "Invalid argument"; }`)
    - `[config]`  {Object} Object returned by getConfig() or minimist API.
    - `[callback]` {Function} Called bcak with the arguments:
      - `fnCommand`  {Function} Command function found.
-     - `args`       {Array} Command arguments (command line words remaining after finding the command)
+     - `args`       {Array} Command arguments (command line words remaining after traversing command tree).
 
 ### Returns:
 
-   - {Function} Command function
+   - {Any} Value returned by `callback` function.
 
 ### Example:
 
@@ -125,13 +132,14 @@ Finds a command function from a command tree.
 
     // Map of command line verbs
     var cmdTree = {    
-        
         version: function(options) {
-            console.info('1.0'); 
+            // Use fields from your package.json file
+            console.info(options.pkg.name + ' ' + options.pkg.version); 
         },
         settings: function(options) {
             console.info(options);
         },
+        // 'help' function is called if no commands match and options. fnHelp is not defined.
         help: function() {
             var appName = path.basename(process.argv[1]);
             [
@@ -141,7 +149,7 @@ Finds a command function from a command tree.
                 'pigs fly              - Makes all pigs fly',
                 'farm init -n <name>   - Initialise farm',
                 'farm list             - List farm animals',
-                'version               - Displays app version',
+                'version               - Displays app name & version',
                 'settings              - Displays app settings'
                 'help                  - Displays this help message'
             ].forEach(function(line) {
@@ -164,21 +172,25 @@ Finds a command function from a command tree.
     };
 
     var cli = require('cli-config');
-    var config = cli.getConfig(options);
-    cli.findCommand(options, config, function(fnCmd, args) {   // <== EXAMPLE API CALL 
-        fnCmd.call(this, config, args); // Execute command function
-    });        
+    var config = cli.getConfig({ dirname: __dirname });
+    var result = cli.findCommand({cmdTree: cmdTree}, config, function(fnCmd, args) {   // <== EXAMPLE API CALL 
+        return fnCmd.call(this, config, args); // Execute command function
+    });
 
 
 ## run(options)
 
-Replace `getConfig()` and `findCommand()` with a single `run()` call. 
+Combines `getConfig()` and `findCommand()` into a single `run()` call. 
 
-Loads configuration settings and executes a command function from the command tree.
+Loads configuration settings and executes a command function from the command tree and returns it's result.
 
 ### Options:
 
-   - `[options]` {Object}  - Options for `getConfig()` and `getCommandFn()` methods as shown above.
+   - `[options]` {Object}  - Accepts all the options for `getConfig()` and `getCommandFn()` methods as shown above.
+   
+### Returns:
+
+   - {Any} Value returned by command function executed.
 
 ### Example
 
