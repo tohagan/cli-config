@@ -4,9 +4,11 @@ A simple `getConfig()` call that combines properties from ...
  
 - System settings file
 - User settings file
+- Settings files in current and ancestors directories
+- A configuration environment variable
 - Command line options 
 - Application overrides
-- package.json fields
+- Application `package.json` fields
 
 If your app uses commands verbs you can implement your entire command line interface using a single `run()` method  that ...
 
@@ -29,7 +31,7 @@ If you only need to fetch configuration and command line options:
 
   - Although usable in any node package, the API is primarily designed for command line interfaces.
   - Configuration files and command line options use one schema defined in your package `defaults.config` file.
-  - BYO parser to support YAML, Coffee Script or any other .config file format.
+  - BYO parser function to support YAML, Coffee Script or any other .config file format.
   - Add comments in your `defaults.config` file so the user can understand how to configure their local copy.
   - If you set the `clone: true` flag, it creates an initial user settings file in `~/.<appname>.config` copied from the package `defaults.config` file
   - When users settings file is create it will initially override all the options in the `default.config` file it was copied from, however we still perform a merge with `defaults.config` since a future upgrade of your app may add new properties that will need to be defaulted via your new `default.config` file.
@@ -48,9 +50,12 @@ Returns configuration settings object.
   - `[options]` {Object}
     - `[dirname]`       Root directory of your app package.  Used to find `package.json` and `defaults.json` files.
     - `[cli]`           {Object} Command line interface parsing options.  Refer to [minimist](https://github.com/substack/minimist) documentation.
-    - `[configFile]`    {String} Local configuration file name. (default: `~/.<appname>.config`).
     - `[clone]`         {Boolean} If `true`, copies package `defaults.config` file to local configuration file. (default: `false`).
     - `[merge]`         {String} Merge attributes using `'shallow'` or `'deep'` recursive merging (default: `'shallow'`).
+    - `[configFile]`    {String} Local configuration file name. (default: `~/.<appname>.config`).
+    - `[ancestors]`     {String} or {Boolean} If truthy, Searches current & ancestor directories for config files (default `false`)
+      - Config file name is: `.<appname>.config` but can be specified by `ancestors` options if it's a string value.
+    - `[env]`           {String} If set, merges config properties from a named environment variable containing serialised config object.
     - `[override]`      {Object} Optional final override to other configuration properties.  (default: `null`) 
 
 **.config** files are parsed as UTF8 JSON format that can contain `//` or `/* ... */` comments.
