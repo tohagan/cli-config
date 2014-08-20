@@ -1,19 +1,20 @@
 ## DESCRIPTION
 
 A simple `getConfig()` call that combines properties from ...
- 
+
 - System settings file
 - User settings file
 - Settings files in current and ancestors directories
 - A configuration environment variable
-- Command line options 
+- Command line options
 - Application overrides
 - Application `package.json` fields
+- Assumes it's called once on start up and so uses synchronous calls and exceptions to report errors.
 
 If your app uses commands verbs you can implement your entire command line interface using a single `run()` method  that ...
 
 - Calls `getConfig()` and then finds your command function from a command tree object and executes it.
-  - Rapidly build your command tree based on functions exported by your modules.    
+  - Rapidly build your command tree based on functions exported by your modules.
   - Command functions accept a single `config` argument returned by `getConfig()`.
 
 ## Simplest API calls:
@@ -23,7 +24,7 @@ This might be all you need to create a complete command line interface to your l
     #!/usr/bin/env node
     require('cli-config').run({dirname: __dirname, cmdTree: require(__dirname + '/lib'});
 
-If you only need to fetch configuration and command line options: 
+If you only need to fetch configuration and command line options:
 
     var config = require('cli-config').getConfig({dirname: __dirname});
 
@@ -56,7 +57,7 @@ Returns configuration settings object.
     - `[ancestors]`     {String} or {Boolean} If truthy, Searches current & ancestor directories for config files (default `false`)
       - Config file name is: `.<appname>.config` but can be specified by `ancestors` options if it's a string value.
     - `[env]`           {String} If set, merges config properties from a named environment variable containing serialised config object.
-    - `[override]`      {Object} Optional final override to other configuration properties.  (default: `null`) 
+    - `[override]`      {Object} Optional final override to other configuration properties.  (default: `null`)
 
 **.config** files are parsed as UTF8 JSON format that can contain `//` or `/* ... */` comments.
 
@@ -65,32 +66,32 @@ Returns configuration settings object.
   - {Object} A configuration object based on merging attributes in the following order:
     1. Package defaults (`defaults.config` JSON file from the `dirname` folder).
     1. Local configuration file (`configFile` JSON file that defaults to `~/.<appname>.config`).
-    1. Command line arguments parsed by [minimist](https://github.com/substack/minimist). 
-    1. An optional `override` object from your application. 
+    1. Command line arguments parsed by [minimist](https://github.com/substack/minimist).
+    1. An optional `override` object from your application.
 
 Adds a obj.pkg field that is a object instance of your package.json file.
 
 *All of these are optional.*
-    
+
 ### Example 1:
 
-Combine configuration options from package file `defaults.config` then `~/.<appname>.config` then command line options then force the `debug` option to be `true`.  Uses a shallow merge so only the top level properties are merged.  
+Combine configuration options from package file `defaults.config` then `~/.<appname>.config` then command line options then force the `debug` option to be `true`.  Uses a shallow merge so only the top level properties are merged.
 
     #!/usr/bin/env node
-    
+
     var config = require('../cli-config').getConfig({dirname: __dirname, override: {debug: true}});
-    
+
     console.log(config.pkg.appName + ' ' + config.pkg.version); // Use package.json fields
     console.log(config);
-    
+
 ### Example 2:
 
 Deep merge nested configuration settings from package `defaults.config` then `./config.json` then command line options.  If `./config.json` does not exist, clone a copy from `defaults.config` so the user can use it to override `defaults.config` in the future.
 
-    
+
     var config = require('../cli-config').getConfig({
         dirname: __dirname,          // Looks for system wide defaults.config in this package folder
-        clone: true,                 // Creates a ./config.json if none exists. 
+        clone: true,                 // Creates a ./config.json if none exists.
         configFile: './config.yaml', // Keep user settings here rather than ~/.<appname>.config
         parser: YAML.parse,          // Parse config file using YAML parser.  Add 'yamljs' package.
         merge: 'deep'                // Deep merge all config file settings & command line settings.
@@ -102,17 +103,17 @@ The command line parser returns an object that can be used to override the syste
 
     var config = require('../cli-config').getConfig({
         dirname: __dirname,
-        cli: { 
+        cli: {
             boolean: {
                 'd': 'debug',
                 'v': 'verbose'
-            } 
-        } 
+            }
+        }
     });
-    
+
 Sets the config.debug and config.verbose options to true.
 
-    $ myapp -d -v     
+    $ myapp -d -v
 
 ## findCommand(options, config, callback)
 
@@ -121,7 +122,7 @@ Finds a command function from a command tree.
 ### Options:
 
    - `[options]` {Object}
-      - `[cmdTree]` {Object} Command tree where attributes are command words and leaf node values are functions. 
+      - `[cmdTree]` {Object} Command tree where attributes are command words and leaf node values are functions.
       - `[fnHelp]`  {Function} Function returned when no command matching is found. (default:  `cmdTree.help || function() { throw "Invalid argument"; }`)
    - `[config]`  {Object} Object returned by getConfig() or minimist API.
    - `[callback]` {Function} Called bcak with the arguments:
@@ -134,15 +135,15 @@ Finds a command function from a command tree.
 
 ### Example:
 
-    // libs containing action functions that accept `config` object as single argument created by `getConfig()`  
+    // libs containing action functions that accept `config` object as single argument created by `getConfig()`
     var pigs = require('lib/pigs");
     var farm = require('lib/farm");
 
     // Map of command line verbs
-    var cmdTree = {    
+    var cmdTree = {
         version: function(options) {
             // Use fields from your package.json file
-            console.info(options.pkg.name + ' ' + options.pkg.version); 
+            console.info(options.pkg.name + ' ' + options.pkg.version);
         },
         settings: function(options) {
             console.info(options);
@@ -181,21 +182,21 @@ Finds a command function from a command tree.
 
     var cli = require('cli-config');
     var config = cli.getConfig({ dirname: __dirname });
-    var result = cli.findCommand({cmdTree: cmdTree}, config, function(fnCmd, args) {   // <== EXAMPLE API CALL 
+    var result = cli.findCommand({cmdTree: cmdTree}, config, function(fnCmd, args) {   // <== EXAMPLE API CALL
         return fnCmd.call(this, config, args); // Execute command function
     });
 
 
 ## run(options)
 
-Combines `getConfig()` and `findCommand()` into a single `run()` call. 
+Combines `getConfig()` and `findCommand()` into a single `run()` call.
 
 Loads configuration settings and executes a command function from the command tree and returns it's result.
 
 ### Options:
 
    - `[options]` {Object}  - Accepts all the options for `getConfig()` and `getCommandFn()` methods as shown above.
-   
+
 ### Returns:
 
    - {Any} Value returned by command function executed.
@@ -203,20 +204,20 @@ Loads configuration settings and executes a command function from the command tr
 ### Example
 
     #!/usr/bin/env node
-    
+
     try {
         var cmdTree = { ... } // Same as getCommandFn() example above.
 
-        var cli = require('cli-config');    
+        var cli = require('cli-config');
         cli.run({
             dirname: __dirname,
-            clone: true, 
+            clone: true,
             cli: {
                 boolean: {
                     'v': 'verbose'  // -v = true/false flag
                 },
-                string: { 
-                    'n': 'name'     // -n <name> = abbreviation for -name <name> 
+                string: {
+                    'n': 'name'     // -n <name> = abbreviation for -name <name>
                 }
             },
             cmdTree: cmdTree,
