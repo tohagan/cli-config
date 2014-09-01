@@ -1,6 +1,6 @@
 {
     "name": "cli-config",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "Simple 'one call' API to convert your lib into a command line interface. Merges system & user settings, CLI options & actions, environment var, app overrides and package.json into one config object. Validates option names and run custom validator. Optionally selects a command exported by your libs and executes it. BYO YAML/CoffeeScript or any other parser to support non-JSON file formats.",
     "homepage": "https://github.com/tohagan/cli-config",
     "author": {
