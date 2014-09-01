@@ -1,7 +1,7 @@
 {
     "name": "cli-config",
     "version": "0.4.2",
-    "description": "A 'one call' API maps lib to a command line interface. Merges settings from package, home, project, project group, command options, env. var, overrides and package.json into one object. Checks  settings schema changes. Optionally runs a lib command. BYO YAML/CoffeeScript/etc settings parser.",
+    "description": "A 'one call' API maps lib to a command line interface. Merges settings from package, home, project, command options, env. var, overrides into one object. Checks settings schema changes. Optionally runs a lib command. BYO settings parser (e.g YAML).",
     "homepage": "https://github.com/tohagan/cli-config",
     "author": {
         "name": "Tony O'Hagan",
