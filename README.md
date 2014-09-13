@@ -66,7 +66,7 @@ Returns configuration settings object.
 
   - `[options]` {Object}
     - `[dirname]`       Root directory of your app package.  Required to find `package.json` and package settings file.
-    - `[cli]`           {Object} Command line interface parsing options.  Refer to [minimist](https://github.com/substack/minimist) documentation.
+    - `[cli]`           {Object} Command line interface parsing options.  Refer to [minimist](https://github.com/substack/minimist) documentation. Define as empty object to use default values.
     - `[clone]`         {Boolean} If `true`, copies package settings file to users home directory. (default: `false`).
     - `[merge]`         {String} Merge attributes using `'shallow'` or `'deep'` recursive merging (default: `'shallow'`).
     - `[configFile]`    {String} Settings file name. (default: `.<appname>.json`).
